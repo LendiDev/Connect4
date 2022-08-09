@@ -12,6 +12,7 @@ const GamePlay = () => {
   });
   const [isPlaying, setIsPlaying] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [winner, setWinner] = useState(0);
 
   const [chips, setChips] = useState([21, 21]);
 
@@ -31,6 +32,10 @@ const GamePlay = () => {
   };
 
   const makeMove = (_, column) => {
+    if (isGameOver) {
+      return;
+    }
+
     if (!isPlaying) {
       startGame();
     }
@@ -76,14 +81,14 @@ const GamePlay = () => {
     }
 
     // check if there is 4 in a row by columns
-    verticalHorizontalDiagonalCheck(columnsArray);
+    checkFourInRow(columnsArray);
     // check if there is 4 in a row by rows
-    verticalHorizontalDiagonalCheck(grid);
+    checkFourInRow(grid);
     // check if there is 4 in a row by diagonals
     diagonalCheck();
   };
 
-  const verticalHorizontalDiagonalCheck = array => {
+  const checkFourInRow = array => {
     array.map(_array => {
       var player = 0;
       var inRow = 0;
@@ -96,7 +101,8 @@ const GamePlay = () => {
           inRow++;
           console.log(inRow);
           if (inRow >= 4) {
-            alert('we have a winner by 4! Player ' + player);
+            setIsGameOver(true);
+            setWinner(player);
             return;
           }
         } else if (playerChips === 0) {
@@ -112,37 +118,38 @@ const GamePlay = () => {
 
     grid.map((rowArray, i) => {
       for (var j = 0; j < rowArray.length; j++) {
-        const tempArray = [];
-        const tempArray2 = [];
+        if (i === 0 || j === 0) {
+          const tempArray = [];
+          const tempArray2 = [];
 
-        for (var index = 0; index < grid.length; index++) {
-          // left diagonal arrays
-          const leftX = i + index;
-          const leftY = j + index;
-          if (leftX < grid.length && leftY < rowArray.length) {
-            tempArray.push(grid[leftX][leftY]);
-          }
+          for (var index = 0; index < grid.length; index++) {
+            // left diagonal arrays
+            const leftX = i + index;
+            const leftY = j + index;
+            if (leftX < grid.length && leftY < rowArray.length) {
+              tempArray.push(grid[leftX][leftY]);
+            }
 
-          // right diagonal arrays
-          const rightX = index + i;
-          const rightY = j - index;
-          if (
-            rightX >= 0 &&
-            rightY >= 0 &&
-            rightX < grid.length &&
-            rightY < rowArray.length
-          ) {
-            tempArray2.push(grid[rightX][rightY]);
+            // right diagonal arrays
+            const rightX = index + i;
+            const rightY = j - index;
+            if (
+              rightX >= 0 &&
+              rightY >= 0 &&
+              rightX < grid.length &&
+              rightY < rowArray.length
+            ) {
+              tempArray2.push(grid[rightX][rightY]);
+            }
           }
+          diagonalArrays.push(tempArray);
+          diagonalArrays.push(tempArray2);
         }
-        diagonalArrays.push(tempArray);
-        diagonalArrays.push(tempArray2);
       }
     });
 
     diagonalArrays = diagonalArrays.filter(rowArray => rowArray.length > 3);
-    console.log(diagonalArrays);
-    verticalHorizontalDiagonalCheck(diagonalArrays);
+    checkFourInRow(diagonalArrays);
   };
 
   const reduceChips = () => {
@@ -167,12 +174,15 @@ const GamePlay = () => {
     setChips([21, 21]);
     setPlayerTurn(0);
     setIsPlaying(false);
+    setIsGameOver(false);
+    setWinner(0);
     generateGrid();
   };
 
   const startGame = () => {
-    setIsPlaying(true);
     selectFirstPlayer();
+    setWinner(0);
+    setIsGameOver(false);
     setIsPlaying(true);
   };
 
@@ -191,6 +201,20 @@ const GamePlay = () => {
 
   return (
     <View style={styles.mainContainer}>
+      <Player
+        playerName={
+          playerTurn === 1 ? playerNames.player1 : playerNames.player2
+        }
+        chips={chips[0]}
+        isPlaying={isPlaying}
+        playerNumber={playerTurn}
+        isGameOver={isGameOver}
+      />
+      <Board
+        winner={winner}
+        grid={grid ? grid : []}
+        onColumnPressedHandled={(i, j) => onColumnPressedHandled(i, j)}
+      />
       <View style={styles.controlsView}>
         <TouchableOpacity
           onPress={() => startGame()}
@@ -209,23 +233,6 @@ const GamePlay = () => {
           </View>
         </TouchableOpacity>
       </View>
-      <Player
-        yourTurn={playerTurn === 1 ? true : false}
-        playerName={playerNames.player1}
-        chips={chips[0]}
-        playerNumber={1}
-      />
-      <Board
-        grid={grid ? grid : []}
-        onColumnPressedHandled={(i, j) => onColumnPressedHandled(i, j)}
-      />
-      <Result />
-      <Player
-        yourTurn={playerTurn === 2 ? true : false}
-        playerName={playerNames.player2}
-        chips={chips[1]}
-        playerNumber={2}
-      />
     </View>
   );
 };
@@ -233,22 +240,24 @@ const GamePlay = () => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'column',
     backgroundColor: '#fff',
   },
   button: {
-    width: 80,
+    width: 100,
     height: 45,
     backgroundColor: '#0096FF',
     borderRadius: 25,
     justifyContent: 'center',
     margin: 5,
   },
-  buttonText: {textAlign: 'center', fontSize: 18, color: 'white'},
+  buttonText: {textAlign: 'center', fontSize: 20, color: 'white'},
   controlsView: {
-    position: 'absolute',
+    flex: 2,
     padding: 10,
     flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

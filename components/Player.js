@@ -2,7 +2,12 @@ import React from 'react';
 import {View, StyleSheet, Text} from 'react-native';
 
 const Player = props => {
-  const {yourTurn, playerName, chips, playerNumber} = props;
+  const {isGameOver, playerName, playerNumber, isPlaying} = props;
+  const gameOverText = isGameOver
+    ? 'Game Over'
+    : isPlaying
+    ? playerName + ' turn'
+    : 'Start the game';
 
   return (
     <View style={styles.mainContainer}>
@@ -11,30 +16,21 @@ const Player = props => {
           style={styles.playerNameText}
           numberOfLines={1}
           adjustsFontSizeToFit={true}>
-          {playerName}
+          {gameOverText}
         </Text>
       </View>
+
       <View style={[styles.row, {justifyContent: 'center'}]}>
-        <Text
-          style={[styles.playerNameText, {fontSize: 30}]}
-          numberOfLines={1}
-          adjustsFontSizeToFit={true}>
-          {yourTurn ? 'Your Turn' : null}
-        </Text>
-      </View>
-      <View style={[styles.row, {justifyContent: 'flex-end'}]}>
         <View style={styles.column}>
-          <View
-            style={[
-              styles.chips,
-              {backgroundColor: playerNumber === 1 ? 'yellow' : 'red'},
-            ]}></View>
-          <Text
-            style={styles.chipsText}
-            numberOfLines={1}
-            adjustsFontSizeToFit={true}>
-            {chips}
-          </Text>
+          {isPlaying ? (
+            isGameOver ? null : (
+              <View
+                style={[
+                  styles.chips,
+                  {backgroundColor: playerNumber === 1 ? 'yellow' : 'red'},
+                ]}></View>
+            )
+          ) : null}
         </View>
       </View>
     </View>
@@ -45,7 +41,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 80,
+    paddingTop: 75,
     paddingBottom: 20,
     justifyContent: 'space-between',
   },

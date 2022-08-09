@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {View, StyleSheet} from 'react-native';
 
 const Coin = props => {
@@ -25,13 +25,13 @@ const Coin = props => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    margin: 5,
     flexDirection: 'column',
     alignItems: 'center',
   },
   coin: {
     backgroundColor: 'white',
     borderRadius: 5,
+    margin: 5,
   },
 });
 
