@@ -3,11 +3,13 @@ import {View, StyleSheet, Text} from 'react-native';
 
 const Result = props => {
   const {winner} = props;
+  const winnerText =
+    winner === 3 ? "It's a draw!" : 'Player ' + winner + ' is a winner!';
   return (
     <>
       <View style={styles.mainContainer} />
       <View style={styles.playerWinContainer}>
-        <Text style={styles.playerWinText}>Player {winner} is a winner!</Text>
+        <Text style={styles.playerWinText}>{winnerText}</Text>
       </View>
     </>
   );

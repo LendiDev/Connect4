@@ -65,6 +65,13 @@ const GamePlay = () => {
   };
 
   const checkWinner = () => {
+    // check for draw
+    if (chips[0] === 0 && chips[1] === 0) {
+      setIsGameOver(true);
+      setWinner(3);
+      return;
+    }
+
     var columnArray = [];
     grid.map((_, index) => {
       columnArray.push(grid[index][0]);
